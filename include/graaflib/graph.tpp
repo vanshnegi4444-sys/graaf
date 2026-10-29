@@ -197,6 +197,22 @@ graph<VERTEX_T, EDGE_T, GRAPH_TYPE_V>::get_neighbors(
 }
 
 template <typename VERTEX_T, typename EDGE_T, graph_type GRAPH_TYPE_V>
+typename graph<VERTEX_T, EDGE_T, GRAPH_TYPE_V>::edges_t
+graph<VERTEX_T, EDGE_T, GRAPH_TYPE_V>::get_edges(vertex_id_t vertex_id) const {
+  static_assert(GRAPH_TYPE_V == graph_type::UNDIRECTED,
+                "get_edges(vertex_id) is only supported for undirected graphs; "
+                "for directed graphs it is ambiguous whether in-edges, "
+                "out-edges, or both should be returned (see #268).");
+
+  edges_t connected_edges;
+  for (const auto neighbor_id : get_neighbors(vertex_id)) {
+    connected_edges.insert(
+        detail::make_sorted_pair(vertex_id, neighbor_id));
+  }
+  return connected_edges;
+}
+
+template <typename VERTEX_T, typename EDGE_T, graph_type GRAPH_TYPE_V>
 vertex_id_t graph<VERTEX_T, EDGE_T, GRAPH_TYPE_V>::add_vertex(auto&& vertex) {
   vertex_id_t vertex_id;
   if (!free_vertex_ids_.empty()) {

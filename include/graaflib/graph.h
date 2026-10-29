@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace graaf {
@@ -35,6 +36,8 @@ class graph {
   using edge_t = EDGE_T;
 
   using neighbors_t = std::vector<vertex_id_t>;
+
+  using edges_t = std::unordered_set<edge_id_t, edge_id_hash>;
 
   using edge_id_to_edge_t = std::unordered_map<edge_id_t, edge_t, edge_id_hash>;
 
@@ -90,6 +93,20 @@ class graph {
   [[nodiscard]] const edge_id_to_edge_t& get_edges() const noexcept {
     return edges_;
   }
+
+  /**
+   * Get the edges incident to a vertex, i.e. the dual of get_neighbors().
+   *
+   * For undirected graphs this returns all edges associated with the
+   * vertex. This method is only supported for undirected graphs: for
+   * directed graphs it is ambiguous whether in-edges, out-edges, or both
+   * should be returned (see issue #268).
+   *
+   * @param  vertex_id The ID of the vertex
+   * @return edges_t - The set of edge IDs incident to the vertex; empty if
+   * the vertex has no edges or does not exist
+   */
+  [[nodiscard]] edges_t get_edges(vertex_id_t vertex_id) const;
 
   /**
    * Checks whether a vertex with a given ID is contained in the graph.
